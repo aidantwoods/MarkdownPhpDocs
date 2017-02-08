@@ -1,0 +1,9 @@
+#!/usr/local/bin/php
+<?php
+
+namespace Aidantwoods\MarkdownPhpDocs;
+
+include(__DIR__.'/../vendor/autoload.php');
+
+$MarkdownPhpDocs = new MarkdownPhpDocs;
+$MarkdownPhpDocs->generateMdFiles();
