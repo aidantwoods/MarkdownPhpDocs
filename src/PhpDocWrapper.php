@@ -4,10 +4,9 @@ namespace Aidantwoods\MarkdownPhpDocs;
 
 class PhpDocWrapper
 {
-    const TMP_DIR = 'markdown-php-docs-tmp';
-    const PHPDOC_BIN = '/vendor/phpdocumentor/phpdocumentor/bin';
+    const TMP_DIR = '.markdown-php-docs-tmp';
+    const PHPDOC_BIN = 'vendor/phpdocumentor/phpdocumentor/bin';
 
-    private $initcwd;
     private $structure;
 
     public function __construct(array $options)
@@ -17,14 +16,11 @@ class PhpDocWrapper
 
     public function run()
     {
-        $this->preserveCurrentDirectory();
-
-        $this->changeToPhpDocExpectedDirectory();
         $this->runPhpDoc();
 
         $this->loadStructureXML();
 
-        $this->restoreOriginalDirectory();
+        $this->cleanup();
     }
 
     public function getStructure()
@@ -37,29 +33,22 @@ class PhpDocWrapper
         $this->structure = simplexml_load_file(self::TMP_DIR.'/structure.xml');
     }
 
-    private function changeToPhpDocExpectedDirectory()
+    private function cleanup()
     {
-        chdir(preg_replace('/[\/][^\/]+$/', '', __DIR__).self::PHPDOC_BIN);
-    }
+        shell_exec('rm -rf '.self::TMP_DIR.'/phpdoc-cache-*');
+        shell_exec('rm '.self::TMP_DIR.'/structure.xml');
 
-    private function preserveCurrentDirectory()
-    {
-        $this->initcwd = getcwd();
+        rmdir(self::TMP_DIR);
     }
 
     private function runPhpDoc()
     {
         shell_exec(
-            './phpdoc -f ' . ($this->options['f'][0] !== '/' and $this->options['f'][0] !== '~' ?
-                    FolderOperations::normaliseDirectory($this->initcwd). '/' : '')
+            __DIR__.'/../'.self::PHPDOC_BIN
+                .'/phpdoc -f '
                 . $this->options['f']
                 . ' -t '.self::TMP_DIR
                 . ' --visibility public --template="xml"'
         );
-    }
-
-    private function restoreOriginalDirectory()
-    {
-        chdir($this->initcwd);
     }
 }
