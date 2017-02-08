@@ -13,8 +13,16 @@ cd MarkdownPhpDocs
 composer update
 ```
 
-## Usage
-(relative to the package directory)
+You can then either directly run the file `markdown-phpdoc` located in the
+`bin` directory, or add this bin directory to your `.bash_profile` to run
+from anywhere. e.g. by adding the lines:
+
 ```
-bin/GenerateDocs -f [input file] -t [target directory]
+PATH="[local-file-path-goes-here]/MarkdownPhpDocs/bin:${PATH}"
+export PATH
+```
+
+## Usage
+```
+markdown-phpdoc -f [input file] -t [target directory]
 ```
