@@ -5,7 +5,7 @@ namespace Aidantwoods\MarkdownPhpDocs;
 class PhpDocWrapper
 {
     const TMP_DIR = 'markdown-php-docs-tmp';
-    const PHPDOC_BIN = '/vendor/aidantwoods/phpDocumentor2/bin';
+    const PHPDOC_BIN = '/vendor/phpdocumentor/phpdocumentor/bin';
 
     private $initcwd;
     private $structure;
@@ -50,7 +50,7 @@ class PhpDocWrapper
     private function runPhpDoc()
     {
         shell_exec(
-            'phpdoc -f ' . ($this->options['f'][0] !== '/' and $this->options['f'][0] !== '~' ?
+            './phpdoc -f ' . ($this->options['f'][0] !== '/' and $this->options['f'][0] !== '~' ?
                     FolderOperations::normaliseDirectory($this->initcwd). '/' : '')
                 . $this->options['f']
                 . ' -t '.self::TMP_DIR
