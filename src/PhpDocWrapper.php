@@ -35,7 +35,7 @@ class PhpDocWrapper
 
     private function cleanup()
     {
-        shell_exec('rm -rf '.self::TMP_DIR.'/phpdoc-cache-*');
+        shell_exec('rm -r '.self::TMP_DIR.'/phpdoc-cache-*');
         shell_exec('rm '.self::TMP_DIR.'/structure.xml');
 
         rmdir(self::TMP_DIR);
