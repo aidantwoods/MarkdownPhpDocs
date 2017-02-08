@@ -77,7 +77,7 @@ class Method
             {
                 $lines[] = '### ' . substr($tag['variable'], 1);
 
-                $description = preg_replace('/<[\/]?p>/', '', $tag['description']);
+                $description = $tag['description'];
 
                 $lines[] = $this->populateLinks($description);
 
@@ -218,11 +218,11 @@ class Method
         {
             if ($tag['name'] == 'param')
             {
-                if (preg_match('/^<p>[=][ ]?(\w+(?:[ ]\w+)?)\n/', $tag['description'], $match))
+                if (preg_match('/^[=][ ]?(\w+(?:[ ]\w+)?)\n/', $tag['description'], $match))
                 {
                     $this->overriddenDefaults[(string) $tag['variable']] = $match[1];
 
-                    $tag['description'] = preg_replace('/^<p>[=][ ]?(\w+(?:[ ]\w+)?)\n/', '<p>', $tag['description']);
+                    $tag['description'] = preg_replace('/^[=][ ]?(\w+(?:[ ]\w+)?)\n/', '', $tag['description']);
                 }
 
                 $tags[] = $tag;
