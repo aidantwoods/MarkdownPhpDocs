@@ -50,7 +50,9 @@ class PhpDocWrapper
     private function runPhpDoc()
     {
         shell_exec(
-            'phpdoc -f ' . FolderOperations::normaliseDirectory($this->initcwd) . '/' . $this->options['f']
+            'phpdoc -f ' . ($this->options['f'][0] !== '/' and $this->options['f'][0] !== '~' ?
+                    FolderOperations::normaliseDirectory($this->initcwd). '/' : '')
+                . $this->options['f']
                 . ' -t '.self::TMP_DIR
                 . ' --visibility public --template="xml"'
         );
