@@ -4,13 +4,16 @@ namespace Aidantwoods\MarkdownPhpDocs;
 
 class Options
 {
-    private $options;
-    private $requiredOptions;
+    private $options,
+            $requiredOptions = array('f', 't'),
+            $optionalOptions = array('v');
 
-    public function __construct(array $requiredOptions)
+    public function __construct()
     {
-        $this->options = getopt(implode(':', $requiredOptions).':');
-        $this->requiredOptions = $requiredOptions;
+        $this->options = getopt(
+            implode(':', $this->requiredOptions).':'
+            . implode('::', $this->optionalOptions).'::'
+        );
 
         $this->checkRequired();
 
@@ -28,8 +31,10 @@ class Options
             }
             return false;
         })) {
-            die(
-                "Not enough args.\nUse `-f` for input file, and `-t` for target directory.\n");
+            die("Not enough args.\n"
+                . "Use `-f` for input file, and `-t` for target directory.\n"
+                . "Use `-v` for verbose output.\n"
+            );
         }
     }
 
