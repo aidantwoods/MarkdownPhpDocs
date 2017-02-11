@@ -218,11 +218,11 @@ class Method
         {
             if ($tag['name'] == 'param')
             {
-                if (preg_match('/^[=][ ]?(\w+(?:[ ]\w+)?)\n/', $tag['description'], $match))
+                if (preg_match('/^[=][ ]?(.++)(?:\n|$)/', $tag['description'], $match))
                 {
                     $this->overriddenDefaults[(string) $tag['variable']] = $match[1];
 
-                    $tag['description'] = preg_replace('/^[=][ ]?(\w+(?:[ ]\w+)?)\n/', '', $tag['description']);
+                    $tag['description'] = preg_replace('/^[=][ ]?(.++)(?:\n|$)/', '', $tag['description']);
                 }
 
                 $tags[] = $tag;
