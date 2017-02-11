@@ -6,15 +6,15 @@ use \SimpleXMLElement;
 
 class Method
 {
-    private $structure;
-    private $docblock;
-    private $name;
-    private $constants = array();
+    private $structure,
+            $docblock,
+            $name,
+            $constants = array(),
 
-    private $tags;
-    private $overriddenDefaults;
-    private $args;
-    private $optionalArgStart;
+            $tags,
+            $overriddenDefaults,
+            $args,
+            $optionalArgStart;
 
     public function __construct(SimpleXMLElement $structure, SimpleXMLElement $constants)
     {
