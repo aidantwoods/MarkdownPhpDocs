@@ -4,13 +4,18 @@ namespace Aidantwoods\MarkdownPhpDocs;
 
 class PhpDocWrapper
 {
-    const TMP_DIR = '.markdown-php-docs-tmp';
     const PHPDOC_BIN = 'vendor/phpdocumentor/phpdocumentor/bin';
 
-    private $structure;
+    private $structure,
+            $tmpDir,
+            $options;
 
     public function __construct(array $options)
     {
+        $this->tmpDir = FolderOperations::normaliseDirectory(
+            shell_exec('mktemp -d')
+        );
+
         $this->options = $options;
     }
 
@@ -30,15 +35,15 @@ class PhpDocWrapper
 
     private function loadStructureXML()
     {
-        $this->structure = simplexml_load_file(self::TMP_DIR.'/structure.xml');
+        $this->structure = simplexml_load_file($this->tmpDir.'/structure.xml');
     }
 
     private function cleanup()
     {
-        shell_exec('rm -r '.self::TMP_DIR.'/phpdoc-cache-*');
-        shell_exec('rm '.self::TMP_DIR.'/structure.xml');
+        shell_exec('rm -r '.$this->tmpDir.'/phpdoc-cache-*');
+        shell_exec('rm '.$this->tmpDir.'/structure.xml');
 
-        rmdir(self::TMP_DIR);
+        rmdir($this->tmpDir);
     }
 
     private function runPhpDoc()
@@ -47,7 +52,7 @@ class PhpDocWrapper
             __DIR__.'/../'.self::PHPDOC_BIN
                 .'/phpdoc -f '
                 . $this->options['f']
-                . ' -t '.self::TMP_DIR
+                . ' -t '.$this->tmpDir
                 . ' --visibility public --template="xml"'
         );
     }

@@ -6,6 +6,6 @@ class FolderOperations
 {
     public static function normaliseDirectory($dir)
     {
-        return preg_replace('/[\/]$/', '', $dir);
+        return preg_replace('/[\/]?(?:\s)*$/', '', $dir);
     }
 }
