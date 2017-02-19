@@ -15,6 +15,7 @@
     },
     "require": {
         "php": ">=5.3",
-        "phpdocumentor/phpdocumentor": "dev-no-markdown"
+        "phpdocumentor/phpdocumentor": "dev-no-markdown",
+        "aidantwoods/betteroptions": "dev-master"
     }
 }

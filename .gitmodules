@@ -1,0 +1,3 @@
+[submodule "vendor/aidantwoods/betteroptions"]
+	path = vendor/aidantwoods/betteroptions
+	url = https://github.com/aidantwoods/BetterOptions

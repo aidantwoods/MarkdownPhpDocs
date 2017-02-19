@@ -51,7 +51,7 @@ class PhpDocWrapper
         shell_exec(
             __DIR__.'/../'.self::PHPDOC_BIN
                 .'/phpdoc -f '
-                . $this->options['f']
+                . $this->options['--file']->getValue()
                 . ' -t '.$this->tmpDir
                 . ' --visibility public --template="xml"'
         );

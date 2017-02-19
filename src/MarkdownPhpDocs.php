@@ -2,6 +2,8 @@
 
 namespace Aidantwoods\MarkdownPhpDocs;
 
+use Aidantwoods\BetterOptions\OptionLoader;
+
 class MarkdownPhpDocs
 {
     private $structure,
@@ -9,7 +11,17 @@ class MarkdownPhpDocs
 
     public function __construct()
     {
-        $this->options = (new Options)->getOptions();
+        $OptionLoader = new OptionLoader(__DIR__.'/CommandLineOptions.json');
+
+        $this->options = $OptionLoader->getOptions();
+
+        if (
+            $OptionLoader->getOption('--help')->isSet()
+            or ! $OptionLoader->getGroup('required')->isSet()
+        ) {
+            echo $OptionLoader->getHelp();
+            die();
+        }
 
         $this->output('Generating structure with phpdoc... ', false);
 
@@ -25,9 +37,9 @@ class MarkdownPhpDocs
     {
         $this->output('Building markdown files... ', false);
 
-        if ( ! file_exists($this->options['t']))
+        if ( ! file_exists($this->options['--target']->getValue()))
         {
-            mkdir($this->options['t']);
+            mkdir($this->options['--target']->getValue());
         }
 
         foreach ($this->structure->file->class->method as $methodStructure)
@@ -35,7 +47,7 @@ class MarkdownPhpDocs
             $method = new Method($methodStructure, $this->structure->file->class->constant);
 
             file_put_contents(
-                FolderOperations::normaliseDirectory($this->options['t'])
+                FolderOperations::normaliseDirectory($this->options['--target']->getValue())
                     . '/' . $methodStructure->name
                     . '.md' , $method->generate()
             );
@@ -46,7 +58,7 @@ class MarkdownPhpDocs
 
     private function output($text = '', $addNewline = true, $addCarriageReturn = false)
     {
-        if (isset($this->options['v']))
+        if (isset($this->options['--verbose']))
         {
             echo ($addCarriageReturn ? "\r" : '')
                     . $text
