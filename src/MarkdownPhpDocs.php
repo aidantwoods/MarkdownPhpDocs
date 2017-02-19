@@ -19,6 +19,11 @@ class MarkdownPhpDocs
             $OptionLoader->getOption('--help')->isSet()
             or ! $OptionLoader->getGroup('required')->isSet()
         ) {
+            if ( ! $OptionLoader->getOption('--help')->isSet())
+            {
+                echo implode("\n", $OptionLoader->getResponseMessages()) . "\n\n";
+            }
+
             echo $OptionLoader->getHelp();
             die();
         }
