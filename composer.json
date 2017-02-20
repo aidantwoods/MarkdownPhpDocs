@@ -16,6 +16,7 @@
     "require": {
         "php": ">=7.0",
         "phpdocumentor/phpdocumentor": "dev-no-markdown",
-        "aidantwoods/betteroptions": "dev-master"
+        "aidantwoods/betteroptions": "dev-master",
+        "symfony/yaml": "^3.2"
     }
 }

@@ -1,0 +1,28 @@
+- group: 'and'
+  name: 'required'
+  members:
+    - option: 'file'
+      name: 'file'
+      type: 'string'
+      description: 'The file for which to generate documentation'
+      aliases:
+        - option: 'f'
+
+    - option: 'target'
+      name: 'target'
+      type: 'string'
+      description: 'The target directory to which documentation should be output'
+      aliases:
+        - option: 't'
+
+- option: 'verbose'
+  name: 'verbose'
+  type: 'bool'
+  description: 'Turn on verbose output'
+  aliases:
+    - option: 'v'
+
+- option: 'help'
+  name: 'help'
+  type: 'bool'
+  description: 'Display this help dialogue'

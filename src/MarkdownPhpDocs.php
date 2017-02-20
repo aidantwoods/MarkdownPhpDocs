@@ -11,7 +11,7 @@ class MarkdownPhpDocs
 
     public function __construct()
     {
-        $OptionLoader = new OptionLoader(__DIR__.'/CommandLineOptions.json');
+        $OptionLoader = new OptionLoader(__DIR__.'/CommandLineOptions.yaml');
 
         $this->options = $OptionLoader->getOptions();
 
