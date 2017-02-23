@@ -15,6 +15,20 @@
       aliases:
         - option: 't'
 
+- option: 'complement'
+  name: 'complement'
+  type: 'string'
+  description: 'A directory containing complement markdown files (content to be appended to those generated from phpdoc or otherwise)'
+  aliases:
+    - option: 'c'
+
+- option: 'supplement'
+  name: 'supplement'
+  type: 'string'
+  description: 'A directory containing supplement markdown files (content to replace that generated from phpdoc)'
+  aliases:
+    - option: 's'
+
 - option: 'verbose'
   name: 'verbose'
   type: 'bool'

@@ -40,22 +40,69 @@ class MarkdownPhpDocs
 
     public function generateMdFiles()
     {
-        $this->output('Building markdown files... ', false);
+        $this->output('Building markdown files...');
 
-        if ( ! file_exists($this->options['target']->getValue()))
+        $target = FolderOperations::normaliseDirectory(
+            $this->options['target']->getValue()
+        );
+
+        if ( ! file_exists($target))
         {
-            mkdir($this->options['target']->getValue());
+            mkdir($target);
         }
+
+        $supplements = $this->getSupplements();
 
         foreach ($this->structure->file->class->method as $methodStructure)
         {
-            $method = new Method($methodStructure, $this->structure->file->class->constant);
+            $fileName = $methodStructure->name . '.md';
 
-            file_put_contents(
-                FolderOperations::normaliseDirectory($this->options['target']->getValue())
-                    . '/' . $methodStructure->name
-                    . '.md' , $method->generate()
-            );
+            if (($supplement = $this->getSupplement($fileName)) !== false)
+            {
+                $this->output("Using supplement file '$fileName'");
+
+                $content = $supplement;
+
+                unset($supplements[$fileName]);
+            }
+            else
+            {
+                $method = new Method($methodStructure, $this->structure->file->class->constant);
+                $content = $method->generate();
+            }
+
+            if (($complement = $this->getComplement($fileName)) !== false)
+            {
+                $this->output("Appending complement file '$fileName'");
+
+                $content .= "\n$complement";
+            }
+
+            file_put_contents("$target/$fileName", $content);
+        }
+
+        if ( ! empty($supplements))
+        {
+            foreach ($supplements as $fileName)
+            {
+                $content = '';
+
+                if (($supplement = $this->getSupplement($fileName)) !== false)
+                {
+                    $this->output("Using supplement file '$fileName'");
+
+                    $content = $supplement;
+                }
+
+                if (($complement = $this->getComplement($fileName)) !== false)
+                {
+                    $this->output("Appending complement file '$fileName'");
+
+                    $content .= "\n$complement";
+                }
+
+                file_put_contents("$target/$fileName", $content);
+            }
         }
 
         $this->output('done.');
@@ -69,5 +116,55 @@ class MarkdownPhpDocs
                     . $text
                     . ($addNewline ? "\n" : '');
         }
+    }
+
+    private function getSupplement(string $file)
+    {
+        if ($this->options['supplement']->isSet())
+        {
+            $supplementDir = FolderOperations::normaliseDirectory($this->options['supplement']->getValue());
+
+            if (is_file("$supplementDir/$file"))
+            {
+                return file_get_contents("$supplementDir/$file");
+            }
+        }
+
+        return false;
+    }
+
+    private function getSupplements() : array
+    {
+        $supplements = array();
+
+        $supplementDir = FolderOperations::normaliseDirectory($this->options['supplement']->getValue());
+
+        if ($this->options['supplement']->isSet())
+        {
+            foreach (scandir($supplementDir) as $item)
+            {
+                if (is_file("$supplementDir/$item"))
+                {
+                    $supplements[$item] = $item;
+                }
+            }
+        }
+
+        return $supplements;
+    }
+
+    private function getComplement(string $file)
+    {
+        if ($this->options['complement']->isSet())
+        {
+            $complementDir = FolderOperations::normaliseDirectory($this->options['complement']->getValue());
+
+            if (is_file("$complementDir/$file"))
+            {
+                return file_get_contents("$complementDir/$file");
+            }
+        }
+
+        return false;
     }
 }
