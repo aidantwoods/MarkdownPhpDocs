@@ -4,8 +4,16 @@
     "license": "MIT",
     "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/aidantwoods/phpDocumentor2"
+            "type": "package",
+            "package": {
+            "name": "aidantwoods/phpdocumentor",
+            "version": "dev-no-markdown",
+                "source": {
+                    "url": "https://github.com/aidantwoods/phpDocumentor2",
+                    "type": "git",
+                    "reference": "no-markdown"
+                }
+            }
         }
     ],
     "autoload": {
@@ -15,7 +23,7 @@
     },
     "require": {
         "php": ">=7.0",
-        "phpdocumentor/phpdocumentor": "dev-no-markdown",
+        "aidantwoods/phpdocumentor": "dev-no-markdown",
         "aidantwoods/betteroptions": "dev-master",
         "symfony/yaml": "^3.2"
     },
