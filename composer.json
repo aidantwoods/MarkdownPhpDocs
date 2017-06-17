@@ -18,5 +18,6 @@
         "phpdocumentor/phpdocumentor": "dev-no-markdown",
         "aidantwoods/betteroptions": "dev-master",
         "symfony/yaml": "^3.2"
-    }
+    },
+    "bin": ["bin/markdown-phpdoc"]
 }
