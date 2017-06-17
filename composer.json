@@ -7,11 +7,11 @@
             "type": "package",
             "package": {
             "name": "aidantwoods/phpdocumentor",
-            "version": "dev-no-markdown",
+            "version": "0.0",
                 "source": {
                     "url": "https://github.com/aidantwoods/phpDocumentor2",
                     "type": "git",
-                    "reference": "no-markdown"
+                    "reference": "v0.0"
                 }
             }
         }
@@ -23,7 +23,7 @@
     },
     "require": {
         "php": ">=7.0",
-        "aidantwoods/phpdocumentor": "dev-no-markdown",
+        "aidantwoods/phpdocumentor": "0.0",
         "aidantwoods/betteroptions": "dev-master",
         "symfony/yaml": "^3.2"
     },
