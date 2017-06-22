@@ -8,8 +8,7 @@
         }
     },
     "require": {
-        "php": ">=7.0",
-        "aidantwoods/betteroptions": "dev-master",
+        "aidantwoods/betteroptions": "^0.0",
         "symfony/yaml": "^3.2",
         "phpdocumentor2/phpdocumentor": "^2.9"
     },
