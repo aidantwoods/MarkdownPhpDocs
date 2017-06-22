@@ -53,9 +53,9 @@ class MarkdownPhpDocs
 
         $supplements = $this->getSupplements();
 
-        foreach ($this->structure->file->class->method as $methodStructure)
+        foreach ($this->structure->getMethods()->getAll() as $methodStructure)
         {
-            $fileName = $methodStructure->name . '.md';
+            $fileName = $methodStructure->getName() . '.md';
 
             if (($supplement = $this->getSupplement($fileName)) !== false)
             {
@@ -67,7 +67,7 @@ class MarkdownPhpDocs
             }
             else
             {
-                $method = new Method($methodStructure, $this->structure->file->class->constant);
+                $method = new Method($methodStructure, $this->structure->getConstants()->getAll());
                 $content = $method->generate();
             }
 
@@ -118,8 +118,10 @@ class MarkdownPhpDocs
         }
     }
 
-    private function getSupplement(string $file)
+    private function getSupplement($file)
     {
+        $file = (string) $file;
+
         if ($this->options['supplement']->isSet())
         {
             $supplementDir = FolderOperations::normaliseDirectory($this->options['supplement']->getValue());
@@ -133,7 +135,7 @@ class MarkdownPhpDocs
         return false;
     }
 
-    private function getSupplements() : array
+    private function getSupplements()
     {
         $supplements = array();
 
@@ -153,8 +155,10 @@ class MarkdownPhpDocs
         return $supplements;
     }
 
-    private function getComplement(string $file)
+    private function getComplement($file)
     {
+        $file = (string) $file;
+
         if ($this->options['complement']->isSet())
         {
             $complementDir = FolderOperations::normaliseDirectory($this->options['complement']->getValue());

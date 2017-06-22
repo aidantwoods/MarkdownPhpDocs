@@ -2,11 +2,13 @@
 
 namespace Aidantwoods\MarkdownPhpDocs;
 
-use \SimpleXMLElement;
+use phpDocumentor\Descriptor\MethodDescriptor;
+use phpDocumentor\Descriptor\Collection;
+use phpDocumentor\Descriptor\Tag\ParamDescriptor;
 
 class Method
 {
-    private $structure,
+    private $method,
             $docblock,
             $name,
             $constants = array(),
@@ -16,16 +18,17 @@ class Method
             $args,
             $optionalArgStart;
 
-    public function __construct(SimpleXMLElement $structure, SimpleXMLElement $constants)
+    public function __construct(MethodDescriptor $method, array $constants)
     {
-        $this->structure = $structure;
-        $this->docblock = $structure->docblock;
-        $this->name = $structure->name;
-        
+        $this->method = $method;
+        $this->summary = $method->getSummary();
+        $this->description = $method->getDescription();
+        $this->name = $method->getName();
+
         foreach ($constants as $constant)
         {
-            $this->constants[(string) $constant->name]
-                = $this->stripNamespace($constant->full_name);
+            $this->constants[(string) $constant->getName()]
+                = $this->stripNamespace($constant->getFullyQualifiedStructuralElementName());
         }
     }
 
@@ -36,13 +39,30 @@ class Method
         $return = 'void';
         $returnDescription = '';
 
-        foreach ($this->structure->docblock->tag as $tag)
+        foreach ($this->method->getTags() as $tags)
         {
-            if ($tag['name'] == 'return')
+            if ($tags instanceof Collection or is_array($tags))
             {
-                $return = $this->stripNamespace($tag->type);
-                $returnDescription = (string) $tag['description'];
+                foreach ($tags as $tag)
+                {
+                    if ($tag->getName() == 'return')
+                    {
+                        $return = $this->friendifyTag($tag);
+
+                        $returnDescription = (string) $tag->getDescription();
+
+                        break;
+                    }
+                }
             }
+            elseif ($tags->getName() == 'return')
+            {
+                $return = $this->friendifyTag($tags);
+
+                $returnDescription = (string) $tags->getDescription();
+            }
+
+
         }
 
         $lines[] = '## Description';
@@ -53,9 +73,9 @@ class Method
 
         $lines[] = '';
 
-        $shortDesc = $this->populateLinks($this->docblock->description);
+        $shortDesc = $this->populateLinks($this->summary);
 
-        $longDesc = $this->populateLinks($this->docblock->{'long-description'});
+        $longDesc = $this->populateLinks($this->description);
 
         if (substr($shortDesc, -1) === '.' and substr($longDesc, 0, 2) === '..')
         {
@@ -68,16 +88,16 @@ class Method
         }
 
         $lines[] = '';
-        
+
         if ( ! $this->isTagDescriptionEmpty())
         {
             $lines[] = '## Parameters';
 
             foreach ($this->tags as $tag)
             {
-                $lines[] = '### ' . substr($tag['variable'], 1);
+                $lines[] = '### ' . substr($tag->getVariableName(), 1);
 
-                $description = $tag['description'];
+                $description = $tag->getDescription();
 
                 $lines[] = $this->populateLinks($description);
 
@@ -141,11 +161,11 @@ class Method
 
         $i = 0;
 
-        foreach ($this->structure->argument as $arg)
+        foreach ($this->method->getArguments() as $arg)
         {
             $argString = $this->processArg($arg);
 
-            if ( ! empty($arg->default) and ! isset($this->optionalArgStart))
+            if ( ! empty($arg->getDefault()) and ! isset($this->optionalArgStart))
             {
                 $this->optionalArgStart = $i;
             }
@@ -161,20 +181,37 @@ class Method
         return preg_replace('/[^\\\]*+[\\\]/', '', $value);
     }
 
+    private function friendifyTag($tag)
+    {
+        $s = '';
+
+        foreach ($tag->getTypes() as $type)
+        {
+            $s .= $this->stripNamespace($type->getName()).'|';
+        }
+
+        if (strlen($s) > 0)
+        {
+            $s = substr($s, 0, strlen($s) -1);
+        }
+
+        return $s;
+    }
+
     private function processArg($arg)
     {
-        $friendlyType = $this->stripNamespace($arg->type);
+        $friendlyType = $this->friendifyTag($arg);
         $friendlyType = preg_replace('/[|]/', ' | ', $friendlyType);
 
-        if ( ! empty($arg->default))
+        if ( ! empty($arg->getDefault()))
         {
-            if (array_key_exists((string) $arg->name, $this->overriddenDefaults))
+            if (array_key_exists((string) $arg->getName(), $this->overriddenDefaults))
             {
-                $default = $this->overriddenDefaults[(string) $arg->name];
+                $default = $this->overriddenDefaults[(string) $arg->getName()];
             }
             else
             {
-                $default = $arg->default;
+                $default = $arg->getDefault();
             }
 
             $defaultText = ' = ' . $default;
@@ -185,13 +222,15 @@ class Method
         }
 
         return $friendlyType . ' '
-                . ($arg['by_reference'] === 'true' ? '&' : '')
-                . $arg->name
+                . ($arg->isByReference() ? '&' : '')
+                . $arg->getName()
                 . $defaultText;
     }
 
     private function populateLinks($text)
     {
+        $text = preg_replace('/[{][@]see[ ](\w+)[}]/', '\\\$1', $text);
+
         if (
             preg_match('/\\\([A-Z_]+)/', $text, $match)
             and array_key_exists($match[1], $this->constants)
@@ -203,7 +242,7 @@ class Method
 
         # fix any @see statements PhpDoc missed o.0
 
-        $text = preg_replace('/[{][@]see[ ](\w+)[}]/', '[`->$1`]($1)', $text);
+
 
         return $text;
     }
@@ -214,18 +253,21 @@ class Method
 
         $this->overriddenDefaults = array();
 
-        foreach ($this->docblock->tag as $tag)
+        foreach ($this->method->getTags() as $tagCollection)
         {
-            if ($tag['name'] == 'param')
+            foreach ($tagCollection as $tag)
             {
-                if (preg_match('/^[=][ ]?(.++)(?:\n|$)/', $tag['description'], $match))
+                if ($tag->getName() === 'param')
                 {
-                    $this->overriddenDefaults[(string) $tag['variable']] = $match[1];
+                    if (preg_match('/^[=][ ]?(.++)(?:\n|$)/', $tag->getDescription(), $match))
+                    {
+                        $this->overriddenDefaults[(string) $tag->getVariableName()] = $match[1];
 
-                    $tag['description'] = preg_replace('/^[=][ ]?(.++)(?:\n|$)/', '', $tag['description']);
+                        $tag->setDescription(preg_replace('/^[=][ ]?(.++)(?:\n|$)/', '', $tag->getDescription()));
+                    }
+
+                    $tags[] = $tag;
                 }
-
-                $tags[] = $tag;
             }
         }
 
@@ -236,12 +278,12 @@ class Method
     {
         foreach ($this->tags as $tag)
         {
-            if ( ! empty($tag['description']))
+            if ( ! empty($tag->getDescription()))
             {
                 return false;
             }
         }
-        
+
         return true;
     }
 }

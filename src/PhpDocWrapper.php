@@ -23,7 +23,7 @@ class PhpDocWrapper
     {
         $this->runPhpDoc();
 
-        $this->loadStructureXML();
+        $this->loadStructure();
 
         $this->cleanup();
     }
@@ -33,15 +33,38 @@ class PhpDocWrapper
         return $this->structure;
     }
 
-    private function loadStructureXML()
+    private function loadStructure()
     {
-        $this->structure = simplexml_load_file($this->tmpDir.'/structure.xml');
+        $file = unserialize(
+            file_get_contents(
+                call_user_func(
+                    function()
+                    {
+                        foreach (scandir("$this->tmpDir/phpdoc-cache-9f") as $f)
+                        {
+                            if (strpos($f, 'phpdoc-cache-file') === 0)
+                            {
+                                return "$this->tmpDir/phpdoc-cache-9f/$f";
+                            }
+                        }
+
+                        throw new \Exception('Could not get phpdoc cache file');
+                    }
+                )
+            )
+        );
+
+        foreach($file->getClasses()->getAll() as $class)
+        {
+            $this->structure = $class;
+
+            break;
+        }
     }
 
     private function cleanup()
     {
         shell_exec('rm -r '.$this->tmpDir.'/phpdoc-cache-*');
-        shell_exec('rm '.$this->tmpDir.'/structure.xml');
 
         rmdir($this->tmpDir);
     }
@@ -49,11 +72,10 @@ class PhpDocWrapper
     private function runPhpDoc()
     {
         shell_exec(
-            __DIR__.'/../'.self::PHPDOC_BIN
-                .'/phpdoc -f '
-                . $this->options['file']->getValue()
-                . ' -t '.$this->tmpDir
-                . ' --visibility public --template="xml"'
+            'php '.__DIR__.'/../'.self::PHPDOC_BIN.'/phpdoc'
+                . ' project:parse'
+                . ' -f ' . $this->options['file']->getValue()
+                . ' -t ' . $this->tmpDir
         );
     }
 }
