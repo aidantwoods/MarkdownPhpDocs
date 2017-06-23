@@ -75,7 +75,7 @@ class PhpDocWrapper
     private function runPhpDoc()
     {
         shell_exec(
-            'php '.$this->dir.'/../'.self::PHPDOC_BIN.'/phpdoc'
+            'php '.$this->dir.self::PHPDOC_BIN.'/phpdoc'
                 . ' project:parse'
                 . ' -f ' . $this->options['file']->getValue()
                 . ' -t ' . $this->tmpDir
