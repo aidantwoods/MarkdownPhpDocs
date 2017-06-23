@@ -3,7 +3,16 @@
 
 namespace Aidantwoods\MarkdownPhpDocs;
 
-include(__DIR__.'/../vendor/autoload.php');
+const AUTOLOAD = 'vendor/autoload.php';
+
+$dir = __DIR__.'/../';
+
+if (is_file($dir.'../../../'.AUTOLOAD))
+{
+    $dir .= '../../../';
+}
+
+require_once($dir.AUTOLOAD);
 
 $MarkdownPhpDocs = new MarkdownPhpDocs;
 $MarkdownPhpDocs->generateMdFiles();
