@@ -9,7 +9,7 @@ class MarkdownPhpDocs
     private $structure,
             $options;
 
-    public function __construct()
+    public function __construct($dir)
     {
         $OptionLoader = new OptionLoader(__DIR__.'/CommandLineOptions.yaml');
 
@@ -30,7 +30,7 @@ class MarkdownPhpDocs
 
         $this->output('Generating structure with phpdoc... ', false);
 
-        $PhpDocWrapper = new PhpDocWrapper($this->options);
+        $PhpDocWrapper = new PhpDocWrapper($this->options, $dir);
         $PhpDocWrapper->run();
 
         $this->structure = $PhpDocWrapper->getStructure();

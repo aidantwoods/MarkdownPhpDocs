@@ -14,5 +14,5 @@ if (is_file($dir.'../../../'.AUTOLOAD))
 
 require_once($dir.AUTOLOAD);
 
-$MarkdownPhpDocs = new MarkdownPhpDocs;
+$MarkdownPhpDocs = new MarkdownPhpDocs($dir);
 $MarkdownPhpDocs->generateMdFiles();

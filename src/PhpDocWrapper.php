@@ -8,13 +8,16 @@ class PhpDocWrapper
 
     private $structure,
             $tmpDir,
-            $options;
+            $options,
+            $dir;
 
-    public function __construct(array $options)
+    public function __construct(array $options, $dir)
     {
         $this->tmpDir = FolderOperations::normaliseDirectory(
             shell_exec('mktemp -d')
         );
+
+        $this->dir = $dir;
 
         $this->options = $options;
     }
@@ -72,7 +75,7 @@ class PhpDocWrapper
     private function runPhpDoc()
     {
         shell_exec(
-            'php '.__DIR__.'/../'.self::PHPDOC_BIN.'/phpdoc'
+            'php '.$this->dir.'/../'.self::PHPDOC_BIN.'/phpdoc'
                 . ' project:parse'
                 . ' -f ' . $this->options['file']->getValue()
                 . ' -t ' . $this->tmpDir
