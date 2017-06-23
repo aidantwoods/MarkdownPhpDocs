@@ -55,6 +55,11 @@ class MarkdownPhpDocs
 
         foreach ($this->structure->getMethods()->getAll() as $methodStructure)
         {
+            if ($methodStructure->getVisibility() !== 'public')
+            {
+                continue;
+            }
+
             $fileName = $methodStructure->getName() . '.md';
 
             if (($supplement = $this->getSupplement($fileName)) !== false)
